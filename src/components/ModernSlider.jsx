@@ -66,6 +66,15 @@ const ModernSlider = () => {
 
     const duplicatedSlides = [...slides, ...slides, ...slides];
 
+    // Handle touch events for mobile
+    const handleTouchStart = (e) => {
+        setIsPaused(true);
+    };
+
+    const handleTouchEnd = (e) => {
+        setIsPaused(false);
+    };
+
     useEffect(() => {
         const scrollContainer = scrollRef.current;
         if (!scrollContainer) return;
@@ -114,9 +123,11 @@ const ModernSlider = () => {
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8 }}
-                className="relative cursor-pointer"
+                className="relative cursor-pointer select-none"
                 onMouseEnter={() => setIsPaused(true)}
                 onMouseLeave={() => setIsPaused(false)}
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd}
             >
                 {/* Gradient fades */}
                 <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-gray-50 to-transparent z-10 pointer-events-none" />
