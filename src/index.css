@@ -1,0 +1,53 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+@theme {
+  /* Custom Colors - India Blue */
+  --color-india-blue-50: #e6f0ff;
+  --color-india-blue-100: #b3d4ff;
+  --color-india-blue-200: #80b8ff;
+  --color-india-blue-300: #4d9cff;
+  --color-india-blue-400: #1a7fff;
+  --color-india-blue-500: #0056d6;
+  --color-india-blue-600: #004db3;
+  --color-india-blue-700: #003d8f;
+  --color-india-blue-800: #002d6b;
+  --color-india-blue-900: #001d47;
+
+  /* Custom Colors - India Saffron */
+  --color-india-saffron-50: #fff5e6;
+  --color-india-saffron-100: #ffe0b3;
+  --color-india-saffron-200: #ffcc80;
+  --color-india-saffron-300: #ffb84d;
+  --color-india-saffron-400: #ffa31a;
+  --color-india-saffron-500: #ff8f00;
+  --color-india-saffron-600: #e68000;
+  --color-india-saffron-700: #cc7000;
+  --color-india-saffron-800: #b36100;
+  --color-india-saffron-900: #995200;
+
+  /* Custom Font Family */
+  --font-sans: 'Inter', system-ui, sans-serif;
+}
+
+* {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.blur-bg {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.text-gradient {
+  background: linear-gradient(to right, var(--color-india-saffron-500), var(--color-india-blue-600));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
