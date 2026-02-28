@@ -1,5 +1,5 @@
-@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
 
 @theme {
   /* Custom Colors - India Blue */
@@ -50,4 +50,86 @@ body {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+/* ===== Custom DatePicker Styling ===== */
+.react-datepicker {
+  font-family: var(--font-sans) !important;
+  border-radius: 1rem !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+  overflow: hidden;
+  padding: 8px !important;
+  border: 1px solid #f3f4f6 !important;
+}
+
+.react-datepicker__header {
+  background-color: white !important;
+  border-bottom: none !important;
+  padding-top: 12px !important;
+}
+
+.react-datepicker__current-month {
+  color: var(--color-india-blue-800) !important;
+  font-weight: 700 !important;
+  font-size: 1rem !important;
+  margin-bottom: 8px !important;
+}
+
+.react-datepicker__day-name {
+  color: #9ca3af !important;
+  font-weight: 600 !important;
+  font-size: 0.75rem !important;
+  width: 2rem !important;
+  line-height: 2rem !important;
+  margin: 0.166rem !important;
+}
+
+.react-datepicker__day {
+  color: #374151 !important;
+  width: 2rem !important;
+  line-height: 2rem !important;
+  border-radius: 0.5rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  transition: all 0.2s !important;
+  margin: 0.166rem !important;
+}
+
+.react-datepicker__day:hover {
+  background-color: var(--color-india-blue-50) !important;
+  color: var(--color-india-blue-600) !important;
+  border-radius: 50% !important;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+  background-color: var(--color-india-blue-500) !important;
+  color: white !important;
+  font-weight: 700 !important;
+  border-radius: 50% !important;
+}
+
+.react-datepicker__day--keyboard-selected:hover {
+  background-color: var(--color-india-blue-600) !important;
+}
+
+.react-datepicker__day--disabled {
+  color: #d1d5db !important;
+}
+
+.react-datepicker__navigation {
+  top: 16px !important;
+}
+
+.react-datepicker__navigation-icon::before {
+  border-color: #9ca3af !important;
+  border-width: 2px 2px 0 0 !important;
+}
+
+.react-datepicker__navigation:hover .react-datepicker__navigation-icon::before {
+  border-color: var(--color-india-blue-500) !important;
+}
+
+.react-datepicker-wrapper {
+  width: 100% !important;
 }

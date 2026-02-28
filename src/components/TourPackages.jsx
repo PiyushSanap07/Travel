@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import useGsapReveal from '../hooks/useGsapReveal';
+import { fetchPackages } from '../services/api';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -11,69 +12,18 @@ const TourPackages = ({ preview = false }) => {
     const headingRef = useGsapReveal('fadeUp', { duration: 0.8 });
     const filterRef = useGsapReveal('fadeUp', { delay: 0.2, duration: 0.6 });
     const [filter, setFilter] = useState('all');
+    const [packages, setPackages] = useState([]);
+    const [pkgLoading, setPkgLoading] = useState(true);
 
-    const packages = [
-        {
-            id: 1,
-            name: 'Golden Triangle Tour',
-            destinations: 'Delhi – Agra – Jaipur',
-            duration: '5 Days / 4 Nights',
-            price: '₹15,999',
-            image: 'https://images.unsplash.com/photo-1587474260584-136574528ed5?q=80&w=2070&auto=format&fit=crop',
-            category: 'heritage',
-            emoji: '🏛️'
-        },
-        {
-            id: 2,
-            name: 'Kerala Backwaters Tour',
-            destinations: 'Munnar – Alleppey – Kochi',
-            duration: '6 Days / 5 Nights',
-            price: '₹18,999',
-            image: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?q=80&w=2048&auto=format&fit=crop',
-            category: 'beach',
-            emoji: '🏝️'
-        },
-        {
-            id: 3,
-            name: 'Kashmir Paradise Tour',
-            destinations: 'Srinagar – Gulmarg – Pahalgam',
-            duration: '5 Days / 4 Nights',
-            price: '₹22,999',
-            image: 'https://images.unsplash.com/photo-1609137144813-7d9921338f24?q=80&w=2787&auto=format&fit=crop',
-            category: 'mountain',
-            emoji: '🏔️'
-        },
-        {
-            id: 4,
-            name: 'Himachal Adventure Tour',
-            destinations: 'Manali – Kasol – Shimla',
-            duration: '6 Days / 5 Nights',
-            price: '₹17,499',
-            image: 'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?q=80&w=2070&auto=format&fit=crop',
-            category: 'adventure',
-            emoji: '🏔️'
-        },
-        {
-            id: 5,
-            name: 'Goa Beach Holiday',
-            destinations: 'North & South Goa',
-            duration: '4 Days / 3 Nights',
-            price: '₹12,999',
-            image: 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?q=80&w=1974&auto=format&fit=crop',
-            category: 'beach',
-            emoji: '🏖️'
-        },
-        {
-            id: 6,
-            name: 'Rajasthan Royal Tour',
-            destinations: 'Jaipur – Jodhpur – Udaipur',
-            duration: '7 Days / 6 Nights',
-            price: '₹25,999',
-            image: 'https://images.unsplash.com/photo-1599661046289-e31897846e41?q=80&w=2070&auto=format&fit=crop',
-            category: 'heritage',
-            emoji: '🏜️'
-        },
-    ];
+    useEffect(() => {
+        fetchPackages()
+            .then(data => {
+                // public site only shows active packages
+                setPackages(data.filter(p => p.status === 'active' || !p.status));
+                setPkgLoading(false);
+            })
+            .catch(() => setPkgLoading(false));
+    }, []);
 
     const filters = [
         { name: 'All Packages', value: 'all' },

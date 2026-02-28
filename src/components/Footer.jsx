@@ -122,7 +122,8 @@ const Footer = () => {
                     <p className="text-white/80">
                         © {currentYear} XYZ Tours. All rights reserved. |
                         <a href="#" className="hover:text-india-saffron-400 transition-colors ml-2">Privacy Policy</a> |
-                        <a href="#" className="hover:text-india-saffron-400 transition-colors ml-2">Terms of Service</a>
+                        <a href="#" className="hover:text-india-saffron-400 transition-colors ml-2">Terms of Service</a> |
+                        <Link to="/admin" className="hover:text-india-saffron-400 transition-colors ml-2 font-medium">Admin Login</Link>
                     </p>
                 </div>
             </div>

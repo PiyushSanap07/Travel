@@ -54,7 +54,7 @@ const AboutPage = () => {
     }, []);
 
     return (
-        <div className="pt-20">
+        <div>
             {/* Page Header */}
             <section className="py-20 bg-gradient-to-br from-india-blue-700 via-india-blue-600 to-india-blue-800 relative overflow-hidden z-0">
                 <div className="absolute inset-0 opacity-10">

@@ -24,6 +24,7 @@ const Navbar = () => {
         { name: 'Home', path: '/' },
         { name: 'Packages', path: '/packages' },
         { name: 'Vehicles', path: '/vehicles' },
+        { name: 'Book Ride', path: '/booking' },
         { name: 'About', path: '/about' },
         { name: 'Contact', path: '/contact' },
     ];
@@ -33,7 +34,12 @@ const Navbar = () => {
             initial={{ y: -100 }}
             animate={{ y: 0 }}
             transition={{ duration: 0.5 }}
-            className="fixed top-0 left-0 right-0 z-[9999] bg-white/95 backdrop-blur-md shadow-lg transition-all duration-300"
+            style={{
+                backgroundColor: isScrolled ? 'white' : 'transparent',
+                boxShadow: isScrolled ? '0 4px 20px rgba(0,0,0,0.1)' : 'none',
+                backdropFilter: isScrolled ? 'blur(10px)' : 'none',
+            }}
+            className="fixed top-0 left-0 right-0 z-[9999] transition-all duration-300"
         >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-20">
@@ -43,7 +49,7 @@ const Navbar = () => {
                         className="flex items-center"
                     >
                         <Link to="/" className="text-2xl font-bold">
-                            <span className="text-india-blue-700">XYZ</span>
+                            <span style={{ color: isScrolled ? '#1e3a8a' : '#ffffff' }}>XYZ</span>
                             <span className="text-india-saffron-500"> Tours</span>
                         </Link>
                     </motion.div>
@@ -54,14 +60,18 @@ const Navbar = () => {
                             <Link
                                 key={link.name}
                                 to={link.path}
-                                className={`relative group text-base font-medium transition-colors ${location.pathname === link.path
-                                    ? 'text-india-blue-700'
-                                    : 'text-gray-700 hover:text-india-blue-600'
-                                    }`}
+                                style={{
+                                    color: isScrolled
+                                        ? location.pathname === link.path ? '#1e3a8a' : '#1f2937'
+                                        : location.pathname === link.path ? '#fbbf24' : '#ffffff',
+                                }}
+                                className="relative group text-base font-medium transition-colors hover:opacity-80"
                             >
                                 {link.name}
-                                <span className={`absolute -bottom-1 left-0 ${location.pathname === link.path ? 'w-full' : 'w-0'
-                                    } h-0.5 bg-india-blue-600 transition-all duration-300 group-hover:w-full`}></span>
+                                <span
+                                    style={{ backgroundColor: isScrolled ? '#1e3a8a' : '#ffffff' }}
+                                    className={`absolute -bottom-1 left-0 h-0.5 transition-all duration-300 group-hover:w-full ${location.pathname === link.path ? 'w-full' : 'w-0'}`}
+                                ></span>
                             </Link>
                         ))}
                     </div>
@@ -70,7 +80,7 @@ const Navbar = () => {
                     <div className="md:hidden">
                         <button
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            className="text-gray-700"
+                            style={{ color: isScrolled ? '#1f2937' : '#ffffff' }}
                         >
                             {isMobileMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
                         </button>

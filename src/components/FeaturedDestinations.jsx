@@ -93,14 +93,14 @@ const FeaturedDestinations = () => {
         };
     }, [isPaused]);
 
+    const headerRef = useGsapReveal('fadeUp', { duration: 0.6 });
+    const carouselRef = useGsapReveal('fadeUp', { duration: 0.8 });
+
     return (
         <section className="py-20 bg-gradient-to-b from-white to-gray-50 overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6 }}
+                <div
+                    ref={headerRef}
                     className="text-center mb-12"
                 >
                     <h2 className="text-4xl md:text-5xl font-bold text-india-blue-800 mb-4">
@@ -109,13 +109,10 @@ const FeaturedDestinations = () => {
                     <p className="text-xl text-gray-600 max-w-2xl mx-auto">
                         Explore India's most captivating places
                     </p>
-                </motion.div>
+                </div>
 
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.8 }}
+                <div
+                    ref={carouselRef}
                     className="relative"
                     onMouseEnter={() => setIsPaused(true)}
                     onMouseLeave={() => setIsPaused(false)}
@@ -168,7 +165,7 @@ const FeaturedDestinations = () => {
                             </motion.div>
                         ))}
                     </div>
-                </motion.div>
+                </div>
             </div>
         </section>
     );

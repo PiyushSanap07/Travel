@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 
 const PackagesPage = () => {
     return (
-        <div className="pt-20">
+        <div>
             {/* Page Header */}
             <section className="py-20 bg-gradient-to-br from-india-blue-800 via-india-blue-700 to-india-saffron-600 relative overflow-hidden z-0">
                 <div className="absolute inset-0 opacity-10">

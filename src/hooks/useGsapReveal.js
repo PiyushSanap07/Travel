@@ -22,7 +22,7 @@ export const useGsapReveal = (preset = 'fadeUp', options = {}) => {
         start = 'top 85%',
         end = 'bottom 20%',
         markers = false,
-        once = true,
+        once = false, // Changed from true to false: User requested animations rewind on scroll up
         scrub = false,
         children = false, // animate direct children instead of element itself
     } = options;
@@ -38,7 +38,12 @@ export const useGsapReveal = (preset = 'fadeUp', options = {}) => {
                 start,
                 end,
                 markers,
-                toggleActions: once ? 'play none none none' : 'play reverse play reverse',
+                // 'play none none reverse' will: 
+                // onEnter: play
+                // onLeave: none
+                // onEnterBack: none
+                // onLeaveBack: reverse (rewinds to initial state so it can be re-played on next scroll down)
+                toggleActions: once ? 'play none none none' : 'play none none reverse',
                 ...(scrub ? { scrub: typeof scrub === 'number' ? scrub : 1 } : {}),
             };
 

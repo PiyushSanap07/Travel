@@ -1,82 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FaUsers, FaSuitcase, FaSnowflake, FaWifi, FaBolt, FaCoffee } from 'react-icons/fa';
+import { fetchVehicles } from '../services/api';
 
 const Vehicles = () => {
     const [filter, setFilter] = useState('all');
+    const [vehicles, setVehicles] = useState([]);
 
-    const vehicles = [
-        {
-            id: 1,
-            name: 'Sedan',
-            model: 'Swift Dzire / Etios',
-            seating: '4 Passengers',
-            luggage: '2-3 Bags',
-            image: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?q=80&w=800&auto=format&fit=crop',
-            pricePerKm: '₹12-14',
-            category: 'small',
-            bestFor: ['Solo travelers', 'Couples', 'Short city tours', 'Airport transfers'],
-            amenities: ['AC', 'Music System', 'Comfortable Seats'],
-            icon: '🚗',
-            routes: ['Mumbai-Lonavala', 'Delhi NCR Tours', 'Bangalore City'],
-        },
-        {
-            id: 2,
-            name: 'SUV',
-            model: 'Innova Crysta / Ertiga',
-            seating: '6-7 Passengers',
-            luggage: '4-5 Bags',
-            image: 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?q=80&w=800&auto=format&fit=crop',
-            pricePerKm: '₹16-20',
-            category: 'family',
-            bestFor: ['Small families', 'Weekend getaways', 'Hill stations', 'Comfortable long drives'],
-            amenities: ['AC', 'Music System', 'Spacious', 'Push Back Seats', 'Charging Points'],
-            icon: '🚙',
-            routes: ['Mumbai-Goa', 'Delhi-Jaipur', 'Shimla-Manali'],
-        },
-        {
-            id: 3,
-            name: 'Tempo Traveller',
-            model: '12-17 Seater',
-            seating: '12-17 Passengers',
-            luggage: '10-12 Bags',
-            image: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?q=80&w=800&auto=format&fit=crop',
-            pricePerKm: '₹25-30',
-            category: 'group',
-            bestFor: ['Group tours', 'Pilgrimage trips', 'Corporate outings', 'Extended families'],
-            amenities: ['AC', 'Push Back Seats', 'LED TV', 'Music System', 'Charging Points', 'Luggage Carrier'],
-            icon: '🚐',
-            routes: ['Golden Triangle', 'Char Dham Yatra', 'Kerala Tour', 'Rajasthan Circuit'],
-        },
-        {
-            id: 4,
-            name: 'Luxury Coach',
-            model: '20-35 Seater AC Bus',
-            seating: '20-35 Passengers',
-            luggage: '15-20 Bags',
-            image: 'https://images.unsplash.com/photo-1570125909232-eb263c188f7e?q=80&w=800&auto=format&fit=crop',
-            pricePerKm: '₹40-50',
-            category: 'large',
-            bestFor: ['Corporate tours', 'College trips', 'Wedding groups', 'Large families'],
-            amenities: ['AC', 'Push Back Seats', 'LED TV', 'Music System', 'Charging Points', 'Wi-Fi', 'Washroom'],
-            icon: '🚌',
-            routes: ['Mumbai-Goa-Ooty', 'North India Circuit', 'South India Temple Tour'],
-        },
-        {
-            id: 5,
-            name: 'Mini Bus',
-            model: '35-45 Seater',
-            seating: '35-45 Passengers',
-            luggage: '20+ Bags',
-            image: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?q=80&w=800&auto=format&fit=crop',
-            pricePerKm: '₹50-60',
-            category: 'large',
-            bestFor: ['School trips', 'Community tours', 'Large corporate events', 'Festival groups'],
-            amenities: ['AC', 'Comfortable Seats', 'Music System', 'Charging Points', 'Large Luggage Space'],
-            icon: '🚍',
-            routes: ['Pan-India Tours', 'Multi-city circuits', 'Long distance group travel'],
-        },
-    ];
+    useEffect(() => {
+        fetchVehicles()
+            .then(data => {
+                // Enrich with display defaults since DB only stores basics
+                setVehicles(data.filter(v => v.status !== 'maintenance').map(v => ({
+                    ...v,
+                    bestFor: [],
+                    amenities: ['AC', 'Music System', 'Comfortable Seats'],
+                    icon: v.category === 'small' ? '🚗' : v.category === 'family' ? '🚙' : v.category === 'group' ? '🚐' : '🚌',
+                    routes: [],
+                })));
+            })
+            .catch(() => { });
+    }, []);
+
 
     const filters = [
         { name: 'All Vehicles', value: 'all' },
@@ -88,15 +33,18 @@ const Vehicles = () => {
 
     const filteredVehicles = filter === 'all' ? vehicles : vehicles.filter(v => v.category === filter);
 
+
+    const headerRef = useGsapReveal('fadeUp', { duration: 0.8 });
+    const filtersRef = useGsapReveal('fadeUp', { delay: 0.2 });
+    const gridRef = useGsapReveal('staggerUp', { children: true, delay: 0.1 });
+    const infoRef = useGsapReveal('scaleIn', { delay: 0.3 });
+
     return (
         <section id="vehicles" className="py-20 bg-gradient-to-b from-white via-gray-50 to-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Section Header */}
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6 }}
+                <div
+                    ref={headerRef}
                     className="text-center mb-16"
                 >
                     <h2 className="text-4xl md:text-5xl font-bold text-india-blue-800 mb-4">
@@ -108,14 +56,11 @@ const Vehicles = () => {
                     <p className="text-xl text-gray-600 max-w-3xl mx-auto">
                         From solo adventures to large group tours, we have the perfect vehicle for every journey across India
                     </p>
-                </motion.div>
+                </div>
 
                 {/* Filter Buttons */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: 0.2 }}
+                <div
+                    ref={filtersRef}
                     className="flex flex-wrap justify-center gap-4 mb-16"
                 >
                     {filters.map((item) => (
@@ -132,12 +77,12 @@ const Vehicles = () => {
                             {item.name}
                         </motion.button>
                     ))}
-                </motion.div>
+                </div>
 
                 {/* Vehicles Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div ref={gridRef} className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {filteredVehicles.map((vehicle, index) => (
-                        <motion.div
+                        <div
                             key={vehicle.id}
                             initial={{ opacity: 0, y: 50 }}
                             whileInView={{ opacity: 1, y: 0 }}
@@ -244,16 +189,13 @@ const Vehicles = () => {
                                     Get Quote for {vehicle.name}
                                 </motion.button>
                             </div>
-                        </motion.div>
+                        </div>
                     ))}
                 </div>
 
                 {/* Info Section */}
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: 0.4 }}
+                <div
+                    ref={infoRef}
                     className="mt-20 bg-gradient-to-br from-india-blue-50 to-india-saffron-50 rounded-3xl p-8 md:p-12"
                 >
                     <h3 className="text-3xl font-bold text-india-blue-800 mb-6 text-center">
@@ -282,7 +224,7 @@ const Vehicles = () => {
                             <p className="text-gray-600 text-sm">Round-the-clock assistance for a smooth and comfortable journey</p>
                         </div>
                     </div>
-                </motion.div>
+                </div>
             </div>
         </section>
     );
