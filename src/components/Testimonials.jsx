@@ -1,10 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { FaQuoteLeft, FaStar } from 'react-icons/fa';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import useGsapReveal from '../hooks/useGsapReveal';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const Testimonials = ({ preview = false }) => {
     const [isPaused, setIsPaused] = useState(false);
     const scrollRef = useRef(null);
+    const sectionRef = useRef(null);
+    const headingRef = useGsapReveal('fadeUp', { duration: 0.8 });
+    const statsRef = useGsapReveal('staggerUp', { stagger: 0.1, start: 'top 80%' });
+    const carouselRef = useRef(null);
 
     const testimonials = [
         {
@@ -91,12 +100,11 @@ const Testimonials = ({ preview = false }) => {
 
     const duplicatedTestimonials = [...testimonials, ...testimonials, ...testimonials];
 
-    // Handle touch events for mobile
-    const handleTouchStart = (e) => {
+    const handleTouchStart = () => {
         setIsPaused(true);
     };
 
-    const handleTouchEnd = (e) => {
+    const handleTouchEnd = () => {
         setIsPaused(false);
     };
 
@@ -104,15 +112,13 @@ const Testimonials = ({ preview = false }) => {
         const scrollContainer = scrollRef.current;
         if (!scrollContainer) return;
 
-        // Initialize scroll position
         scrollContainer.scrollLeft = scrollContainer.scrollWidth / 3;
 
         let animationId;
-        const scrollSpeed = 0.5; // Consistent slower speed - same as ModernSlider
+        const scrollSpeed = 0.5;
 
         const scroll = () => {
             if (!isPaused && scrollContainer) {
-                // Scroll in OPPOSITE direction (decrease scrollLeft = move right-to-left visually)
                 scrollContainer.scrollLeft -= scrollSpeed;
                 const maxScroll = scrollContainer.scrollWidth / 3;
                 if (scrollContainer.scrollLeft <= 0) {
@@ -130,39 +136,45 @@ const Testimonials = ({ preview = false }) => {
         };
     }, [isPaused]);
 
+    // GSAP: clip-path reveal for carousel
+    useEffect(() => {
+        if (!carouselRef.current) return;
+        const ctx = gsap.context(() => {
+            gsap.fromTo(carouselRef.current, {
+                clipPath: 'polygon(0 0, 0 0, 0 100%, 0 100%)',
+                opacity: 0,
+            }, {
+                clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+                opacity: 1,
+                duration: 1.4,
+                ease: 'power4.inOut',
+                scrollTrigger: {
+                    trigger: carouselRef.current,
+                    start: 'top 85%',
+                    toggleActions: 'play none none none',
+                },
+            });
+        }, sectionRef);
+
+        return () => ctx.revert();
+    }, []);
+
     return (
-        <section className="py-20 bg-gradient-to-b from-gray-50 to-white overflow-hidden">
+        <section ref={sectionRef} className="py-20 bg-gradient-to-b from-gray-50 to-white overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Section Header */}
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6 }}
-                    className="text-center mb-12"
-                >
-                    <motion.h2
-                        className="text-4xl md:text-5xl font-bold text-india-blue-800 mb-4"
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6, delay: 0.2 }}
-                    >
+                <div ref={headingRef} className="text-center mb-12">
+                    <h2 className="text-4xl md:text-5xl font-bold text-india-blue-800 mb-4">
                         What Our Travelers Say
-                    </motion.h2>
-                    <motion.p
-                        className="text-xl text-gray-600"
-                        initial={{ opacity: 0 }}
-                        whileInView={{ opacity: 1 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6, delay: 0.4 }}
-                    >
+                    </h2>
+                    <p className="text-xl text-gray-600">
                         Real experiences from people who traveled with us
-                    </motion.p>
-                </motion.div>
+                    </p>
+                </div>
 
-                {/* Testimonials Carousel with Click to Pause */}
+                {/* Testimonials Carousel */}
                 <div
+                    ref={carouselRef}
                     className="relative cursor-pointer select-none"
                     onMouseEnter={() => setIsPaused(true)}
                     onMouseLeave={() => setIsPaused(false)}
@@ -209,6 +221,7 @@ const Testimonials = ({ preview = false }) => {
                                         <img
                                             src={testimonial.image}
                                             alt={testimonial.name}
+                                            loading="lazy"
                                             className="w-14 h-14 rounded-full object-cover ring-2 ring-india-blue-200"
                                         />
                                         <div>
@@ -226,13 +239,7 @@ const Testimonials = ({ preview = false }) => {
                 </div>
 
                 {/* Stats Section */}
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: 0.3 }}
-                    className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16"
-                >
+                <div ref={statsRef} className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16">
                     <div className="text-center p-6 bg-white rounded-xl shadow-md">
                         <div className="text-4xl font-bold text-india-blue-700 mb-2">10,000+</div>
                         <div className="text-gray-600">Happy Travelers</div>
@@ -249,7 +256,7 @@ const Testimonials = ({ preview = false }) => {
                         <div className="text-4xl font-bold text-india-saffron-600 mb-2">15+</div>
                         <div className="text-gray-600">Years Experience</div>
                     </div>
-                </motion.div>
+                </div>
             </div>
         </section>
     );

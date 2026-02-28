@@ -1,9 +1,58 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import WhyChooseUs from '../components/WhyChooseUs';
 import Statistics from '../components/Statistics';
-import { motion } from 'framer-motion';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import useGsapReveal from '../hooks/useGsapReveal';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const AboutPage = () => {
+    const headerRef = useGsapReveal('fadeUp', { duration: 0.8, start: 'top 90%' });
+    const storyRef = useRef(null);
+    const missionRef = useRef(null);
+
+    // GSAP alternating fade left/right for story sections
+    useEffect(() => {
+        const ctx = gsap.context(() => {
+            if (storyRef.current) {
+                gsap.fromTo(storyRef.current, {
+                    opacity: 0,
+                    x: -60,
+                }, {
+                    opacity: 1,
+                    x: 0,
+                    duration: 1,
+                    ease: 'power3.out',
+                    scrollTrigger: {
+                        trigger: storyRef.current,
+                        start: 'top 80%',
+                        toggleActions: 'play none none none',
+                    },
+                });
+            }
+
+            if (missionRef.current) {
+                gsap.fromTo(missionRef.current, {
+                    opacity: 0,
+                    x: 60,
+                }, {
+                    opacity: 1,
+                    x: 0,
+                    duration: 1,
+                    ease: 'power3.out',
+                    scrollTrigger: {
+                        trigger: missionRef.current,
+                        start: 'top 80%',
+                        toggleActions: 'play none none none',
+                    },
+                });
+            }
+        });
+
+        return () => ctx.revert();
+    }, []);
+
     return (
         <div className="pt-20">
             {/* Page Header */}
@@ -14,48 +63,41 @@ const AboutPage = () => {
                     }}></div>
                 </div>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-[5]">
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6 }}
-                        className="text-center text-white"
-                    >
+                    <div ref={headerRef} className="text-center text-white">
                         <h1 className="text-5xl md:text-6xl font-bold mb-4">
                             About XYZ Tours
                         </h1>
                         <p className="text-xl md:text-2xl text-gray-200 max-w-3xl mx-auto">
                             Your trusted partner for unforgettable journeys across India
                         </p>
-                    </motion.div>
+                    </div>
                 </div>
             </section>
 
             {/* About Content */}
             <section className="py-20 bg-white">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6 }}
-                        className="prose prose-lg max-w-none"
-                    >
-                        <h2 className="text-3xl font-bold text-india-blue-800 mb-6">Our Story</h2>
-                        <p className="text-gray-700 text-lg leading-relaxed mb-6">
-                            At XYZ Tours, we believe that travel is more than just visiting new places—it's about creating lasting memories,
-                            experiencing diverse cultures, and discovering the extraordinary beauty that India has to offer.
-                        </p>
-                        <p className="text-gray-700 text-lg leading-relaxed mb-6">
-                            With over 15 years of experience in the travel industry, we've helped thousands of travelers explore India's
-                            most captivating destinations. From the snow-capped peaks of Kashmir to the sun-kissed beaches of Goa,
-                            from the royal palaces of Rajasthan to the serene backwaters of Kerala—we curate experiences that go beyond ordinary tourism.
-                        </p>
-                        <h2 className="text-3xl font-bold text-india-blue-800 mb-6 mt-12">Our Mission</h2>
-                        <p className="text-gray-700 text-lg leading-relaxed mb-6">
-                            To provide exceptional, personalized travel experiences that showcase the rich cultural heritage,
-                            natural beauty, and warm hospitality of India while ensuring the highest standards of comfort, safety, and customer satisfaction.
-                        </p>
-                    </motion.div>
+                    <div className="prose prose-lg max-w-none">
+                        <div ref={storyRef}>
+                            <h2 className="text-3xl font-bold text-india-blue-800 mb-6">Our Story</h2>
+                            <p className="text-gray-700 text-lg leading-relaxed mb-6">
+                                At XYZ Tours, we believe that travel is more than just visiting new places—it's about creating lasting memories,
+                                experiencing diverse cultures, and discovering the extraordinary beauty that India has to offer.
+                            </p>
+                            <p className="text-gray-700 text-lg leading-relaxed mb-6">
+                                With over 15 years of experience in the travel industry, we've helped thousands of travelers explore India's
+                                most captivating destinations. From the snow-capped peaks of Kashmir to the sun-kissed beaches of Goa,
+                                from the royal palaces of Rajasthan to the serene backwaters of Kerala—we curate experiences that go beyond ordinary tourism.
+                            </p>
+                        </div>
+                        <div ref={missionRef}>
+                            <h2 className="text-3xl font-bold text-india-blue-800 mb-6 mt-12">Our Mission</h2>
+                            <p className="text-gray-700 text-lg leading-relaxed mb-6">
+                                To provide exceptional, personalized travel experiences that showcase the rich cultural heritage,
+                                natural beauty, and warm hospitality of India while ensuring the highest standards of comfort, safety, and customer satisfaction.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </section>
 

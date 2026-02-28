@@ -1,8 +1,13 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { FaHeart, FaMapMarkerAlt } from 'react-icons/fa';
+import useGsapReveal from '../hooks/useGsapReveal';
 
 const InstagramGallery = () => {
+    const headingRef = useGsapReveal('fadeUp', { duration: 0.8 });
+    const gridRef = useGsapReveal('staggerScale', { stagger: 0.08, start: 'top 80%' });
+    const ctaRef = useGsapReveal('scaleIn', { delay: 0.3 });
+
     const photos = [
         {
             id: 1,
@@ -57,33 +62,24 @@ const InstagramGallery = () => {
     return (
         <section className="py-20 bg-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6 }}
-                    className="text-center mb-12"
-                >
+                <div ref={headingRef} className="text-center mb-12">
                     <h2 className="text-4xl md:text-5xl font-bold text-india-blue-800 mb-4">
                         Travel Gallery
                     </h2>
                     <p className="text-xl text-gray-600">Follow our adventures @xyztours</p>
-                </motion.div>
+                </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {photos.map((photo, index) => (
+                <div ref={gridRef} className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {photos.map((photo) => (
                         <motion.div
                             key={photo.id}
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            whileInView={{ opacity: 1, scale: 1 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.5, delay: index * 0.1 }}
                             whileHover={{ scale: 1.05, zIndex: 10 }}
                             className="relative aspect-square rounded-2xl overflow-hidden shadow-lg group cursor-pointer"
                         >
                             <img
                                 src={photo.image}
                                 alt={photo.location}
+                                loading="lazy"
                                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                             />
 
@@ -109,13 +105,7 @@ const InstagramGallery = () => {
                     ))}
                 </div>
 
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: 0.4 }}
-                    className="text-center mt-12"
-                >
+                <div ref={ctaRef} className="text-center mt-12">
                     <motion.a
                         href="https://instagram.com"
                         target="_blank"
@@ -126,7 +116,7 @@ const InstagramGallery = () => {
                     >
                         Follow Us on Instagram
                     </motion.a>
-                </motion.div>
+                </div>
             </div>
         </section>
     );

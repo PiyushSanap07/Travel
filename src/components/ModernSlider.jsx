@@ -1,9 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import useGsapReveal from '../hooks/useGsapReveal';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const ModernSlider = () => {
     const scrollRef = useRef(null);
     const [isPaused, setIsPaused] = useState(false);
+    const sectionRef = useRef(null);
+    const headingRef = useGsapReveal('fadeUp', { duration: 0.8 });
+    const sliderRef = useRef(null);
 
     const slides = [
         {
@@ -66,12 +74,11 @@ const ModernSlider = () => {
 
     const duplicatedSlides = [...slides, ...slides, ...slides];
 
-    // Handle touch events for mobile
-    const handleTouchStart = (e) => {
+    const handleTouchStart = () => {
         setIsPaused(true);
     };
 
-    const handleTouchEnd = (e) => {
+    const handleTouchEnd = () => {
         setIsPaused(false);
     };
 
@@ -80,7 +87,7 @@ const ModernSlider = () => {
         if (!scrollContainer) return;
 
         let animationId;
-        const scrollSpeed = 0.5; // Consistent slower speed
+        const scrollSpeed = 0.5;
 
         const scroll = () => {
             if (!isPaused && scrollContainer) {
@@ -99,30 +106,43 @@ const ModernSlider = () => {
         };
     }, [isPaused]);
 
+    // GSAP: clip-path reveal for slider container
+    useEffect(() => {
+        if (!sliderRef.current) return;
+        const ctx = gsap.context(() => {
+            gsap.fromTo(sliderRef.current, {
+                clipPath: 'polygon(0 0, 0 0, 0 100%, 0 100%)',
+                opacity: 0,
+            }, {
+                clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+                opacity: 1,
+                duration: 1.4,
+                ease: 'power4.inOut',
+                scrollTrigger: {
+                    trigger: sliderRef.current,
+                    start: 'top 85%',
+                    toggleActions: 'play none none none',
+                },
+            });
+        }, sectionRef);
+        return () => ctx.revert();
+    }, []);
+
     return (
-        <section className="py-20 bg-gradient-to-b from-gray-50 to-white overflow-hidden">
+        <section ref={sectionRef} className="py-20 bg-gradient-to-b from-gray-50 to-white overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6 }}
-                    className="text-center"
-                >
+                <div ref={headingRef} className="text-center">
                     <h2 className="text-4xl md:text-5xl font-bold text-india-blue-800 mb-4">
                         Trending Destinations
                     </h2>
                     <p className="text-xl text-gray-600">
                         Explore the most popular travel spots across India
                     </p>
-                </motion.div>
+                </div>
             </div>
 
-            <motion.div
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8 }}
+            <div
+                ref={sliderRef}
                 className="relative cursor-pointer select-none"
                 onMouseEnter={() => setIsPaused(true)}
                 onMouseLeave={() => setIsPaused(false)}
@@ -147,11 +167,11 @@ const ModernSlider = () => {
                             <img
                                 src={slide.image}
                                 alt={slide.title}
+                                loading="lazy"
                                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
 
-                            {/* Content */}
                             <div className="absolute bottom-0 left-0 right-0 p-5 transform transition-transform duration-300">
                                 <p className="text-india-saffron-400 text-sm font-semibold mb-1">{slide.subtitle}</p>
                                 <h3 className="text-2xl font-bold text-white mb-2">{slide.title}</h3>
@@ -159,7 +179,6 @@ const ModernSlider = () => {
                                     {slide.description}
                                 </p>
 
-                                {/* Explore button - appears on hover */}
                                 <motion.button
                                     initial={{ opacity: 0, y: 10 }}
                                     whileHover={{ opacity: 1, y: 0 }}
@@ -169,12 +188,11 @@ const ModernSlider = () => {
                                 </motion.button>
                             </div>
 
-                            {/* Border glow on hover */}
                             <div className="absolute inset-0 border-2 border-transparent group-hover:border-india-saffron-400/60 rounded-2xl transition-all duration-300 pointer-events-none"></div>
                         </motion.div>
                     ))}
                 </div>
-            </motion.div>
+            </div>
         </section>
     );
 };

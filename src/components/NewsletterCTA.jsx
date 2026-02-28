@@ -1,10 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { FaPaperPlane } from 'react-icons/fa';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import useGsapReveal from '../hooks/useGsapReveal';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const NewsletterCTA = () => {
     const [email, setEmail] = useState('');
     const [isSubmitted, setIsSubmitted] = useState(false);
+    const sectionRef = useRef(null);
+    const contentRef = useGsapReveal('fadeUp', { duration: 0.8 });
+    const orb1Ref = useRef(null);
+    const orb2Ref = useRef(null);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -15,57 +24,50 @@ const NewsletterCTA = () => {
         }, 3000);
     };
 
-    return (
-        <section className="py-20 relative overflow-hidden">
-            {/* Animated gradient background */}
-            <div className="absolute inset-0 bg-gradient-to-br from-india-blue-600 via-india-blue-700 to-india-saffron-600"></div>
-            <motion.div
-                className="absolute inset-0 bg-gradient-to-tr from-india-saffron-500/30 via-transparent to-india-blue-500/30"
-                animate={{
-                    opacity: [0.3, 0.6, 0.3],
-                }}
-                transition={{
-                    duration: 8,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                }}
-            />
+    // GSAP floating orbs
+    useEffect(() => {
+        const ctx = gsap.context(() => {
+            gsap.to(orb1Ref.current, {
+                y: -30,
+                scale: 1.2,
+                duration: 6,
+                repeat: -1,
+                yoyo: true,
+                ease: 'sine.inOut',
+            });
 
-            {/* Decorative elements */}
-            <motion.div
+            gsap.to(orb2Ref.current, {
+                y: 30,
+                scale: 1.3,
+                duration: 7,
+                repeat: -1,
+                yoyo: true,
+                ease: 'sine.inOut',
+                delay: 1,
+            });
+        }, sectionRef);
+
+        return () => ctx.revert();
+    }, []);
+
+    return (
+        <section ref={sectionRef} className="py-20 relative overflow-hidden">
+            {/* Gradient background */}
+            <div className="absolute inset-0 bg-gradient-to-br from-india-blue-600 via-india-blue-700 to-india-saffron-600"></div>
+            <div className="absolute inset-0 bg-gradient-to-tr from-india-saffron-500/30 via-transparent to-india-blue-500/30 animate-pulse opacity-30" />
+
+            {/* Decorative orbs — GSAP animated */}
+            <div
+                ref={orb1Ref}
                 className="absolute top-20 left-20 w-32 h-32 bg-white/10 rounded-full blur-3xl"
-                animate={{
-                    y: [0, -30, 0],
-                    scale: [1, 1.2, 1],
-                }}
-                transition={{
-                    duration: 6,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                }}
             />
-            <motion.div
+            <div
+                ref={orb2Ref}
                 className="absolute bottom-20 right-20 w-40 h-40 bg-india-saffron-400/20 rounded-full blur-3xl"
-                animate={{
-                    y: [0, 30, 0],
-                    scale: [1, 1.3, 1],
-                }}
-                transition={{
-                    duration: 7,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    delay: 1
-                }}
             />
 
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6 }}
-                    className="text-center"
-                >
+                <div ref={contentRef} className="text-center">
                     <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
                         Get Exclusive Travel Deals
                     </h2>
@@ -109,7 +111,7 @@ const NewsletterCTA = () => {
                     <p className="text-white/70 text-sm mt-6">
                         We respect your privacy. Unsubscribe anytime.
                     </p>
-                </motion.div>
+                </div>
             </div>
         </section>
     );

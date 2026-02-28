@@ -1,11 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { useInView } from 'framer-motion';
-import { useRef } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import useGsapReveal from '../hooks/useGsapReveal';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const TourPackages = ({ preview = false }) => {
-    const ref = useRef(null);
-    const isInView = useInView(ref, { once: true, margin: "-100px" });
+    const sectionRef = useRef(null);
+    const headingRef = useGsapReveal('fadeUp', { duration: 0.8 });
+    const filterRef = useGsapReveal('fadeUp', { delay: 0.2, duration: 0.6 });
     const [filter, setFilter] = useState('all');
 
     const packages = [
@@ -83,34 +87,51 @@ const TourPackages = ({ preview = false }) => {
         ? packages
         : packages.filter(pkg => pkg.category === filter);
 
+    // GSAP stagger for package cards
+    useEffect(() => {
+        const ctx = gsap.context(() => {
+            const cards = sectionRef.current?.querySelectorAll('.package-card');
+            if (cards && cards.length > 0) {
+                gsap.fromTo(cards, {
+                    opacity: 0,
+                    y: 60,
+                    rotateX: -10,
+                    transformOrigin: '50% 100%',
+                }, {
+                    opacity: 1,
+                    y: 0,
+                    rotateX: 0,
+                    duration: 0.8,
+                    ease: 'power3.out',
+                    stagger: 0.12,
+                    scrollTrigger: {
+                        trigger: sectionRef.current,
+                        start: 'top 70%',
+                        toggleActions: 'play none none none',
+                    },
+                });
+            }
+        }, sectionRef);
+
+        return () => ctx.revert();
+    }, [filter]);
+
     return (
-        <section id="packages" className="py-20 bg-gradient-to-b from-white to-gray-50">
+        <section ref={sectionRef} id="packages" className="py-20 bg-gradient-to-b from-white to-gray-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Section Header */}
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6 }}
-                    className="text-center mb-12"
-                >
+                <div ref={headingRef} className="text-center mb-12">
                     <h2 className="text-4xl md:text-5xl font-bold text-india-blue-800 mb-4">
                         India Tour Packages
                     </h2>
                     <p className="text-xl text-gray-600 max-w-2xl mx-auto">
                         Experience the best of India with our carefully curated tour packages
                     </p>
-                </motion.div>
+                </div>
 
-                {/* Filter Buttons - Hidden in preview mode */}
+                {/* Filter Buttons */}
                 {!preview && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6, delay: 0.2 }}
-                        className="flex flex-wrap justify-center gap-4 mb-12"
-                    >
+                    <div ref={filterRef} className="flex flex-wrap justify-center gap-4 mb-12">
                         {filters.map((item) => (
                             <button
                                 key={item.value}
@@ -123,31 +144,28 @@ const TourPackages = ({ preview = false }) => {
                                 {item.name}
                             </button>
                         ))}
-                    </motion.div>
+                    </div>
                 )}
 
                 {/* Packages Grid */}
-                <div ref={ref} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {(preview ? filteredPackages.slice(0, 3) : filteredPackages).map((pkg, index) => (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {(preview ? filteredPackages.slice(0, 3) : filteredPackages).map((pkg) => (
                         <motion.div
                             key={pkg.id}
-                            initial={{ opacity: 0, y: 50 }}
-                            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
-                            transition={{ duration: 0.5, delay: index * 0.1 }}
                             whileHover={{ y: -15 }}
-                            className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 group relative"
+                            className="package-card bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 group relative"
                         >
                             {/* Image */}
                             <div className="relative h-64 overflow-hidden">
                                 <motion.img
                                     src={pkg.image}
                                     alt={pkg.name}
+                                    loading="lazy"
                                     className="w-full h-full object-cover transition-all duration-700"
                                     whileHover={{ scale: 1.15, filter: "brightness(1.1)" }}
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
 
-                                {/* Gradient overlay on hover */}
                                 <motion.div
                                     className="absolute inset-0 bg-gradient-to-br from-india-saffron-500/40 via-transparent to-india-blue-600/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                                 />
@@ -161,7 +179,6 @@ const TourPackages = ({ preview = false }) => {
                                     </span>
                                 </div>
 
-                                {/* Book Now button that appears on hover */}
                                 <motion.div
                                     initial={{ opacity: 0, y: 20 }}
                                     whileHover={{ opacity: 1, y: 0 }}
@@ -179,7 +196,6 @@ const TourPackages = ({ preview = false }) => {
 
                             {/* Content */}
                             <div className="p-6 relative">
-                                {/* Subtle gradient background on card */}
                                 <div className="absolute inset-0 bg-gradient-to-br from-india-blue-50/0 to-india-saffron-50/0 group-hover:from-india-blue-50/50 group-hover:to-india-saffron-50/50 transition-all duration-500 rounded-b-2xl" />
 
                                 <div className="relative z-10">
@@ -206,7 +222,6 @@ const TourPackages = ({ preview = false }) => {
                                 </div>
                             </div>
 
-                            {/* Glowing border effect on hover */}
                             <div className="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-india-saffron-300/50 transition-all duration-500 pointer-events-none" />
                         </motion.div>
                     ))}

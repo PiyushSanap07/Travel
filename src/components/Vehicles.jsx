@@ -125,8 +125,8 @@ const Vehicles = () => {
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             className={`px-6 py-3 rounded-full font-medium transition-all duration-300 ${filter === item.value
-                                    ? 'bg-gradient-to-r from-india-blue-600 to-india-blue-700 text-white shadow-xl scale-105'
-                                    : 'bg-white text-gray-700 hover:bg-gray-100 shadow-md'
+                                ? 'bg-gradient-to-r from-india-blue-600 to-india-blue-700 text-white shadow-xl scale-105'
+                                : 'bg-white text-gray-700 hover:bg-gray-100 shadow-md'
                                 }`}
                         >
                             {item.name}
@@ -151,6 +151,7 @@ const Vehicles = () => {
                                 <motion.img
                                     src={vehicle.image}
                                     alt={vehicle.name}
+                                    loading="lazy"
                                     className="w-full h-full object-cover transition-all duration-700"
                                     whileHover={{ scale: 1.1 }}
                                 />

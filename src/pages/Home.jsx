@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import Hero from '../components/Hero';
 import ModernSlider from '../components/ModernSlider';
 import TourPackages from '../components/TourPackages';
@@ -8,8 +8,16 @@ import Testimonials from '../components/Testimonials';
 import NewsletterCTA from '../components/NewsletterCTA';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import useGsapReveal from '../hooks/useGsapReveal';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const Home = () => {
+    const packagesHeadingRef = useGsapReveal('fadeUp', { duration: 0.8 });
+    const viewAllRef = useGsapReveal('scaleIn', { delay: 0.2 });
+
     return (
         <>
             <Hero />
@@ -18,31 +26,18 @@ const Home = () => {
             {/* Popular Packages Preview Section */}
             <section className="py-20 bg-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6 }}
-                        className="text-center mb-12"
-                    >
+                    <div ref={packagesHeadingRef} className="text-center mb-12">
                         <h2 className="text-4xl md:text-5xl font-bold text-india-blue-800 mb-4">
                             Popular Tour Packages
                         </h2>
                         <p className="text-xl text-gray-600">
                             Handpicked tours for the perfect getaway
                         </p>
-                    </motion.div>
+                    </div>
 
-                    {/* Show limited packages - we'll modify TourPackages component to accept a limit prop later */}
                     <TourPackages preview={true} />
 
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        whileInView={{ opacity: 1 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6, delay: 0.3 }}
-                        className="text-center mt-12"
-                    >
+                    <div ref={viewAllRef} className="text-center mt-12">
                         <Link to="/packages">
                             <motion.button
                                 whileHover={{ scale: 1.05, boxShadow: "0 15px 35px rgba(0, 86, 214, 0.3)" }}
@@ -52,7 +47,7 @@ const Home = () => {
                                 View All Packages
                             </motion.button>
                         </Link>
-                    </motion.div>
+                    </div>
                 </div>
             </section>
 

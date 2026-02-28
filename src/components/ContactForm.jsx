@@ -1,6 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { FaUser, FaEnvelope, FaPhone, FaCommentDots } from 'react-icons/fa';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import useGsapReveal from '../hooks/useGsapReveal';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const ContactForm = () => {
     const [formData, setFormData] = useState({
@@ -12,6 +17,10 @@ const ContactForm = () => {
     });
 
     const [errors, setErrors] = useState({});
+    const headingRef = useGsapReveal('fadeUp', { duration: 0.8 });
+    const sectionRef = useRef(null);
+    const infoRef = useRef(null);
+    const formRef = useRef(null);
 
     const packages = [
         'Golden Triangle Tour',
@@ -76,7 +85,6 @@ const ContactForm = () => {
             ...prev,
             [name]: value,
         }));
-        // Clear error when user starts typing
         if (errors[name]) {
             setErrors(prev => ({
                 ...prev,
@@ -85,34 +93,68 @@ const ContactForm = () => {
         }
     };
 
+    // GSAP fade left/right for info panel and form
+    useEffect(() => {
+        const ctx = gsap.context(() => {
+            if (infoRef.current) {
+                gsap.fromTo(infoRef.current, {
+                    opacity: 0,
+                    x: -60,
+                }, {
+                    opacity: 1,
+                    x: 0,
+                    duration: 1,
+                    ease: 'power3.out',
+                    scrollTrigger: {
+                        trigger: infoRef.current,
+                        start: 'top 80%',
+                        toggleActions: 'play none none none',
+                    },
+                });
+            }
+
+            if (formRef.current) {
+                // Stagger form fields
+                const fields = formRef.current.querySelectorAll('.form-field');
+                gsap.fromTo(fields, {
+                    opacity: 0,
+                    y: 30,
+                    x: 20,
+                }, {
+                    opacity: 1,
+                    y: 0,
+                    x: 0,
+                    duration: 0.6,
+                    ease: 'power3.out',
+                    stagger: 0.1,
+                    scrollTrigger: {
+                        trigger: formRef.current,
+                        start: 'top 80%',
+                        toggleActions: 'play none none none',
+                    },
+                });
+            }
+        }, sectionRef);
+
+        return () => ctx.revert();
+    }, []);
+
     return (
-        <section id="contact" className="py-20 bg-gradient-to-br from-india-blue-50 to-white">
+        <section ref={sectionRef} id="contact" className="py-20 bg-gradient-to-br from-india-blue-50 to-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Section Header */}
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6 }}
-                    className="text-center mb-16"
-                >
+                <div ref={headingRef} className="text-center mb-16">
                     <h2 className="text-4xl md:text-5xl font-bold text-india-blue-800 mb-4">
                         Plan Your Journey
                     </h2>
                     <p className="text-xl text-gray-600 max-w-2xl mx-auto">
                         Get in touch with us to create your perfect Indian adventure
                     </p>
-                </motion.div>
+                </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                     {/* Contact Info */}
-                    <motion.div
-                        initial={{ opacity: 0, x: -50 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6 }}
-                        className="space-y-8"
-                    >
+                    <div ref={infoRef} className="space-y-8">
                         <div className="bg-gradient-to-br from-india-blue-600 to-india-blue-800 rounded-2xl p-8 text-white">
                             <h3 className="text-3xl font-bold mb-6">Contact Information</h3>
 
@@ -142,19 +184,14 @@ const ContactForm = () => {
                                 <p className="text-white/90">Sunday: 10:00 AM - 6:00 PM</p>
                             </div>
                         </div>
-                    </motion.div>
+                    </div>
 
                     {/* Contact Form */}
-                    <motion.div
-                        initial={{ opacity: 0, x: 50 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6 }}
-                    >
+                    <div ref={formRef}>
                         <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-xl p-8">
                             <div className="space-y-6">
                                 {/* Name */}
-                                <div>
+                                <div className="form-field">
                                     <label className="flex items-center text-gray-700 font-medium mb-2">
                                         <FaUser className="mr-2 text-india-blue-600" />
                                         Name*
@@ -173,7 +210,7 @@ const ContactForm = () => {
                                 </div>
 
                                 {/* Email */}
-                                <div>
+                                <div className="form-field">
                                     <label className="flex items-center text-gray-700 font-medium mb-2">
                                         <FaEnvelope className="mr-2 text-india-blue-600" />
                                         Email*
@@ -192,7 +229,7 @@ const ContactForm = () => {
                                 </div>
 
                                 {/* Phone */}
-                                <div>
+                                <div className="form-field">
                                     <label className="flex items-center text-gray-700 font-medium mb-2">
                                         <FaPhone className="mr-2 text-india-blue-600" />
                                         Phone*
@@ -211,7 +248,7 @@ const ContactForm = () => {
                                 </div>
 
                                 {/* Package Selection */}
-                                <div>
+                                <div className="form-field">
                                     <label className="text-gray-700 font-medium mb-2 block">
                                         Select Package*
                                     </label>
@@ -234,7 +271,7 @@ const ContactForm = () => {
                                 </div>
 
                                 {/* Message */}
-                                <div>
+                                <div className="form-field">
                                     <label className="flex items-center text-gray-700 font-medium mb-2">
                                         <FaCommentDots className="mr-2 text-india-blue-600" />
                                         Message*
@@ -253,17 +290,19 @@ const ContactForm = () => {
                                 </div>
 
                                 {/* Submit Button */}
-                                <motion.button
-                                    whileHover={{ scale: 1.02 }}
-                                    whileTap={{ scale: 0.98 }}
-                                    type="submit"
-                                    className="w-full py-4 bg-gradient-to-r from-india-saffron-500 to-india-saffron-600 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
-                                >
-                                    Submit Inquiry
-                                </motion.button>
+                                <div className="form-field">
+                                    <motion.button
+                                        whileHover={{ scale: 1.02 }}
+                                        whileTap={{ scale: 0.98 }}
+                                        type="submit"
+                                        className="w-full py-4 bg-gradient-to-r from-india-saffron-500 to-india-saffron-600 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                                    >
+                                        Submit Inquiry
+                                    </motion.button>
+                                </div>
                             </div>
                         </form>
-                    </motion.div>
+                    </div>
                 </div>
             </div>
         </section>

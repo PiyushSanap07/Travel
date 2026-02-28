@@ -1,12 +1,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { useInView } from 'framer-motion';
-import { useRef } from 'react';
 import { FaCheckCircle, FaHeadset, FaMapMarkedAlt, FaUsers } from 'react-icons/fa';
+import useGsapReveal from '../hooks/useGsapReveal';
 
 const WhyChooseUs = () => {
-    const ref = useRef(null);
-    const isInView = useInView(ref, { once: true, margin: "-100px" });
+    const headingRef = useGsapReveal('fadeUp', { duration: 0.8 });
+    const gridRef = useGsapReveal('staggerUp', { stagger: 0.12, start: 'top 80%' });
 
     const features = [
         {
@@ -39,29 +38,20 @@ const WhyChooseUs = () => {
         <section id="about" className="py-20 bg-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Section Header */}
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6 }}
-                    className="text-center mb-16"
-                >
+                <div ref={headingRef} className="text-center mb-16">
                     <h2 className="text-4xl md:text-5xl font-bold text-india-blue-800 mb-4">
                         Why Choose Us
                     </h2>
                     <p className="text-xl text-gray-600 max-w-2xl mx-auto">
                         Your trusted partner for unforgettable journeys across India
                     </p>
-                </motion.div>
+                </div>
 
                 {/* Features Grid */}
-                <div ref={ref} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    {features.map((feature, index) => (
+                <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    {features.map((feature) => (
                         <motion.div
                             key={feature.id}
-                            initial={{ opacity: 0, y: 50 }}
-                            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
-                            transition={{ duration: 0.5, delay: index * 0.1 }}
                             whileHover={{ y: -5 }}
                             className="bg-gradient-to-br from-white to-gray-50 p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 text-center group"
                         >

@@ -2,9 +2,12 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaEnvelope, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
+import useGsapReveal from '../hooks/useGsapReveal';
 
 const Footer = () => {
     const currentYear = new Date().getFullYear();
+    const columnsRef = useGsapReveal('staggerUp', { stagger: 0.1, start: 'top 90%' });
+    const bottomRef = useGsapReveal('fadeUp', { delay: 0.3, start: 'top 95%' });
 
     const quickLinks = [
         { name: 'Home', path: '/' },
@@ -24,14 +27,9 @@ const Footer = () => {
     return (
         <footer className="bg-gradient-to-br from-india-blue-900 via-india-blue-800 to-india-blue-900 text-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div ref={columnsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                     {/* Company Info */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6 }}
-                    >
+                    <div>
                         <h3 className="text-2xl font-bold mb-4">
                             <span className="text-white">XYZ</span>
                             <span className="text-india-saffron-400"> Tours</span>
@@ -53,15 +51,10 @@ const Footer = () => {
                                 </motion.a>
                             ))}
                         </div>
-                    </motion.div>
+                    </div>
 
                     {/* Quick Links */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6, delay: 0.1 }}
-                    >
+                    <div>
                         <h4 className="text-xl font-bold mb-4">Quick Links</h4>
                         <ul className="space-y-2">
                             {quickLinks.map((link) => (
@@ -76,15 +69,10 @@ const Footer = () => {
                                 </li>
                             ))}
                         </ul>
-                    </motion.div>
+                    </div>
 
                     {/* Contact Info */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6, delay: 0.2 }}
-                    >
+                    <div>
                         <h4 className="text-xl font-bold mb-4">Contact Info</h4>
                         <ul className="space-y-3">
                             <li className="flex items-start">
@@ -103,15 +91,10 @@ const Footer = () => {
                                 <span className="text-white/80">info@xyztours.com</span>
                             </li>
                         </ul>
-                    </motion.div>
+                    </div>
 
                     {/* Newsletter */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6, delay: 0.3 }}
-                    >
+                    <div>
                         <h4 className="text-xl font-bold mb-4">Newsletter</h4>
                         <p className="text-white/80 mb-4">
                             Subscribe to get special offers and travel tips!
@@ -131,23 +114,17 @@ const Footer = () => {
                                 Subscribe
                             </motion.button>
                         </form>
-                    </motion.div>
+                    </div>
                 </div>
 
                 {/* Bottom Bar */}
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: 0.4 }}
-                    className="mt-12 pt-8 border-t border-white/20 text-center"
-                >
+                <div ref={bottomRef} className="mt-12 pt-8 border-t border-white/20 text-center">
                     <p className="text-white/80">
                         © {currentYear} XYZ Tours. All rights reserved. |
                         <a href="#" className="hover:text-india-saffron-400 transition-colors ml-2">Privacy Policy</a> |
                         <a href="#" className="hover:text-india-saffron-400 transition-colors ml-2">Terms of Service</a>
                     </p>
-                </motion.div>
+                </div>
             </div>
         </footer>
     );

@@ -1,12 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { useInView } from 'framer-motion';
-import { useRef } from 'react';
 import { FaUsers, FaGlobeAsia, FaStar, FaAward } from 'react-icons/fa';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import useGsapReveal from '../hooks/useGsapReveal';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const Statistics = () => {
-    const ref = useRef(null);
-    const isInView = useInView(ref, { once: true });
+    const sectionRef = useRef(null);
+    const headingRef = useGsapReveal('fadeUp', { duration: 0.8 });
+    const [hasAnimated, setHasAnimated] = useState(false);
     const [counts, setCounts] = useState({
         travelers: 0,
         destinations: 0,
@@ -50,60 +54,82 @@ const Statistics = () => {
         },
     ];
 
+    // GSAP ScrollTrigger for number counting + stagger cards
     useEffect(() => {
-        if (!isInView) return;
+        const ctx = gsap.context(() => {
+            const statCards = sectionRef.current?.querySelectorAll('.stat-card');
+
+            // Stagger stat cards in
+            if (statCards && statCards.length > 0) {
+                gsap.fromTo(statCards, {
+                    opacity: 0,
+                    y: 60,
+                    scale: 0.8,
+                }, {
+                    opacity: 1,
+                    y: 0,
+                    scale: 1,
+                    duration: 0.7,
+                    ease: 'back.out(1.5)',
+                    stagger: 0.12,
+                    scrollTrigger: {
+                        trigger: sectionRef.current,
+                        start: 'top 75%',
+                        toggleActions: 'play none none none',
+                        onEnter: () => setHasAnimated(true),
+                    },
+                });
+            }
+        }, sectionRef);
+
+        return () => ctx.revert();
+    }, []);
+
+    // Count up animation using GSAP
+    useEffect(() => {
+        if (!hasAnimated) return;
 
         stats.forEach((stat) => {
-            let start = 0;
-            const increment = stat.end / 100;
-            const timer = setInterval(() => {
-                start += increment;
-                if (start >= stat.end) {
-                    setCounts(prev => ({ ...prev, [stat.key]: stat.end }));
-                    clearInterval(timer);
-                } else {
+            const obj = { val: 0 };
+            gsap.to(obj, {
+                val: stat.end,
+                duration: 2,
+                ease: 'power2.out',
+                onUpdate: () => {
                     setCounts(prev => ({
                         ...prev,
-                        [stat.key]: stat.decimals ? parseFloat(start.toFixed(stat.decimals)) : Math.floor(start)
+                        [stat.key]: stat.decimals
+                            ? parseFloat(obj.val.toFixed(stat.decimals))
+                            : Math.floor(obj.val)
                     }));
-                }
-            }, 20);
+                },
+            });
         });
-    }, [isInView]);
+    }, [hasAnimated]);
 
     return (
-        <section className="py-20 bg-gradient-to-br from-india-blue-700 via-india-blue-600 to-india-blue-800 relative overflow-hidden">
+        <section ref={sectionRef} className="py-20 bg-gradient-to-br from-india-blue-700 via-india-blue-600 to-india-blue-800 relative overflow-hidden">
             {/* Background Pattern */}
             <div className="absolute inset-0 opacity-10">
                 <div className="absolute top-0 left-0 w-96 h-96 bg-india-saffron-400 rounded-full blur-3xl"></div>
                 <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
             </div>
 
-            <div ref={ref} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6 }}
-                    className="text-center mb-16"
-                >
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div ref={headingRef} className="text-center mb-16">
                     <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
                         Our Achievements
                     </h2>
                     <p className="text-xl text-white/90 max-w-2xl mx-auto">
                         Numbers that speak for our excellence
                     </p>
-                </motion.div>
+                </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    {stats.map((stat, index) => (
-                        <motion.div
+                    {stats.map((stat) => (
+                        <div
                             key={stat.id}
-                            initial={{ opacity: 0, scale: 0.5 }}
-                            whileInView={{ opacity: 1, scale: 1 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.5, delay: index * 0.1 }}
-                            className="text-center group"
+                            className="stat-card text-center group"
                         >
                             <motion.div
                                 whileHover={{ scale: 1.1, rotate: 5 }}
@@ -112,16 +138,11 @@ const Statistics = () => {
                             >
                                 {stat.icon}
                             </motion.div>
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-                                transition={{ duration: 0.5, delay: index * 0.1 + 0.3 }}
-                                className="text-5xl font-bold text-white mb-2"
-                            >
+                            <div className="text-5xl font-bold text-white mb-2">
                                 {counts[stat.key].toLocaleString()}{stat.suffix}
-                            </motion.div>
+                            </div>
                             <p className="text-xl text-white/90">{stat.label}</p>
-                        </motion.div>
+                        </div>
                     ))}
                 </div>
             </div>

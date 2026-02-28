@@ -1,9 +1,60 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import ContactForm from '../components/ContactForm';
 import { motion } from 'framer-motion';
 import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaClock } from 'react-icons/fa';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import useGsapReveal from '../hooks/useGsapReveal';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const ContactPage = () => {
+    const headerRef = useGsapReveal('fadeUp', { duration: 0.8, start: 'top 90%' });
+    const cardsRef = useGsapReveal('staggerUp', { stagger: 0.1, start: 'top 80%' });
+    const reachHeadingRef = useGsapReveal('fadeUp', { duration: 0.8 });
+    const mapRef = useRef(null);
+    const directionsRef = useRef(null);
+
+    // GSAP fade left/right for map and directions
+    useEffect(() => {
+        const ctx = gsap.context(() => {
+            if (mapRef.current) {
+                gsap.fromTo(mapRef.current, {
+                    opacity: 0,
+                    x: -60,
+                }, {
+                    opacity: 1,
+                    x: 0,
+                    duration: 1,
+                    ease: 'power3.out',
+                    scrollTrigger: {
+                        trigger: mapRef.current,
+                        start: 'top 80%',
+                        toggleActions: 'play none none none',
+                    },
+                });
+            }
+            if (directionsRef.current) {
+                gsap.fromTo(directionsRef.current, {
+                    opacity: 0,
+                    x: 60,
+                }, {
+                    opacity: 1,
+                    x: 0,
+                    duration: 1,
+                    ease: 'power3.out',
+                    scrollTrigger: {
+                        trigger: directionsRef.current,
+                        start: 'top 80%',
+                        toggleActions: 'play none none none',
+                    },
+                });
+            }
+        });
+
+        return () => ctx.revert();
+    }, []);
+
     return (
         <div className="pt-20">
             {/* Page Header */}
@@ -14,26 +65,21 @@ const ContactPage = () => {
                     }}></div>
                 </div>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-[5]">
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6 }}
-                        className="text-center text-white"
-                    >
+                    <div ref={headerRef} className="text-center text-white">
                         <h1 className="text-5xl md:text-6xl font-bold mb-4">
                             Get In Touch
                         </h1>
                         <p className="text-xl md:text-2xl text-gray-100 max-w-3xl mx-auto">
                             We're here to help plan your perfect journey
                         </p>
-                    </motion.div>
+                    </div>
                 </div>
             </section>
 
             {/* Contact Info Cards */}
             <section className="py-16 bg-gray-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div ref={cardsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {[
                             { icon: <FaPhone className="text-3xl" />, title: 'Phone', info: '+91 98765 43210', subtitle: 'Mon-Sat 9am-8pm' },
                             { icon: <FaEnvelope className="text-3xl" />, title: 'Email', info: 'info@xyztours.com', subtitle: 'Online support' },
@@ -42,10 +88,6 @@ const ContactPage = () => {
                         ].map((item, index) => (
                             <motion.div
                                 key={index}
-                                initial={{ opacity: 0, y: 30 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 0.5, delay: index * 0.1 }}
                                 whileHover={{ y: -5, scale: 1.02 }}
                                 className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 text-center"
                             >
@@ -64,28 +106,19 @@ const ContactPage = () => {
             {/* Interactive Map & Reach Out Section */}
             <section className="py-16 bg-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6 }}
-                        className="text-center mb-12"
-                    >
+                    <div ref={reachHeadingRef} className="text-center mb-12">
                         <h2 className="text-4xl md:text-5xl font-bold text-india-blue-800 mb-4">
                             How to Reach Us
                         </h2>
                         <p className="text-xl text-gray-600">
                             Visit our office or connect with us online
                         </p>
-                    </motion.div>
+                    </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         {/* Map */}
-                        <motion.div
-                            initial={{ opacity: 0, x: -30 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.6 }}
+                        <div
+                            ref={mapRef}
                             className="rounded-2xl overflow-hidden shadow-2xl h-[450px]"
                         >
                             <iframe
@@ -98,14 +131,11 @@ const ContactPage = () => {
                                 referrerPolicy="no-referrer-when-downgrade"
                                 title="XYZ Tours Location"
                             />
-                        </motion.div>
+                        </div>
 
                         {/* Reach Out Instructions */}
-                        <motion.div
-                            initial={{ opacity: 0, x: 30 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.6 }}
+                        <div
+                            ref={directionsRef}
                             className="flex flex-col justify-center space-y-6"
                         >
                             <div className="bg-gradient-to-br from-india-blue-50 to-india-saffron-50 p-8 rounded-2xl">
@@ -175,7 +205,7 @@ const ContactPage = () => {
                                     <span className="text-sm text-gray-600">Sunday: Closed (Online support available)</span>
                                 </p>
                             </div>
-                        </motion.div>
+                        </div>
                     </div>
                 </div>
             </section>
