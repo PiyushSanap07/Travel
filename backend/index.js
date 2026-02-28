@@ -6,7 +6,7 @@ const multer = require('multer');
 const fs = require('fs');
 
 const app = express();
-const PORT = 5001;
+const PORT = process.env.PORT || 5001;
 
 // Ensure uploads directory exists
 const uploadsDir = path.join(__dirname, 'uploads');
@@ -30,7 +30,14 @@ const upload = multer({
 });
 
 // Middleware
-app.use(cors({ origin: 'http://localhost:5173' }));
+app.use(cors({
+    origin: [
+        'http://localhost:5173',
+        'http://localhost:4173',
+        /\.onrender\.com$/,   // all Render subdomains
+    ],
+    credentials: true,
+}));
 app.use(express.json());
 
 // Serve uploaded images as static files
@@ -40,7 +47,9 @@ app.use('/uploads', express.static(uploadsDir));
 
 app.post('/api/upload', upload.single('image'), (req, res) => {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
-    const imageUrl = `http://localhost:5001/uploads/${req.file.filename}`;
+    const host = req.get('host');
+    const protocol = req.protocol;
+    const imageUrl = `${protocol}://${host}/uploads/${req.file.filename}`;
     res.json({ url: imageUrl, filename: req.file.filename });
 });
 
