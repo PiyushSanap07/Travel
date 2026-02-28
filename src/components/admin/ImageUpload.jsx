@@ -1,6 +1,8 @@
 import React, { useRef, useState } from 'react';
 import { Upload, X, Image, Link, Loader2 } from 'lucide-react';
 
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+
 /**
  * ImageUpload component
  * Props:
@@ -23,7 +25,7 @@ const ImageUpload = ({ value, onChange }) => {
         try {
             const formData = new FormData();
             formData.append('image', file);
-            const res = await fetch('http://localhost:5001/api/upload', { method: 'POST', body: formData });
+            const res = await fetch(`${API_BASE}/api/upload`, { method: 'POST', body: formData });
             const data = await res.json();
             if (data.url) { onChange(data.url); }
             else { setError(data.error || 'Upload failed.'); }
